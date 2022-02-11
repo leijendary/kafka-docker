@@ -2,8 +2,7 @@ FROM openjdk:11
 ENV SCALA_VERSION=2.13
 ENV KAFKA_VERSION=3.1.0
 ENV FILE_NAME=kafka_${SCALA_VERSION}-${KAFKA_VERSION}
-RUN wget https://dlcdn.apache.org/kafka/${KAFKA_VERSION}/${FILE_NAME}.tgz
-RUN tar -xzvf ${FILE_NAME}.tgz && rm ${FILE_NAME}.tgz
+RUN wget -qO- https://dlcdn.apache.org/kafka/${KAFKA_VERSION}/${FILE_NAME}.tgz | tar -xvz
 ENV KAFKA_NODE_ID=1
 ENV KAFKA_CONTROLLER_QUORUM_VOTERS=1@kafka:9093
 ENV KAFKA_LOG_DIRS=/var/lib/kafka/data
