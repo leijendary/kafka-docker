@@ -1,0 +1,26 @@
+version: "3"
+services:
+  kafka:
+    build: .
+    image: kafka:3.1.0
+    platform: linux/arm64
+    hostname: kafka
+    container_name: kafka
+    ports:
+      - "9092:9092"
+      - "9093:9093"
+      - "29092:29092"
+    volumes:
+      - kafka_data:/var/lib/kafka/data
+    networks:
+      - kafka_network
+
+volumes:
+  kafka_data:
+    name: kafka_data
+    driver: local
+
+networks:
+  kafka_network:
+    name: kafka_network
+    driver: bridge
