@@ -1,4 +1,5 @@
-FROM openjdk:11
+FROM openjdk:11-jre-slim
+RUN apt-get update && apt-get -y install wget && rm -rf /var/cache/apt/archives
 ENV SCALA_VERSION=2.13
 ENV KAFKA_VERSION=3.1.0
 ENV FILE_NAME=kafka_${SCALA_VERSION}-${KAFKA_VERSION}
