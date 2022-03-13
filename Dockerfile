@@ -2,30 +2,13 @@ FROM eclipse-temurin:17-jre
 RUN apt-get update && apt-get -y install wget && rm -rf /var/cache/apt/archives
 ENV SCALA_VERSION=2.13
 ENV KAFKA_VERSION=3.1.0
-ENV FILE_NAME=kafka_${SCALA_VERSION}-${KAFKA_VERSION}
-ENV KAFKA_PATH=/opt/kafka
-RUN mkdir $KAFKA_PATH
-RUN wget -qO- https://dlcdn.apache.org/kafka/${KAFKA_VERSION}/${FILE_NAME}.tgz | tar -C $KAFKA_PATH --strip 1 -xvz
-ENV KAFKA_NODE_ID=1
-ENV KAFKA_CONTROLLER_QUORUM_VOTERS=1@localhost:9093
+ENV KAFKA_HOME=/opt/kafka
+ENV PATH=${PATH}:${KAFKA_HOME}/bin
+RUN mkdir $KAFKA_HOME
+RUN wget -qO- https://dlcdn.apache.org/kafka/${KAFKA_VERSION}/kafka_${SCALA_VERSION}-${KAFKA_VERSION}.tgz | tar -C $KAFKA_HOME --strip 1 -xvz
 ENV KAFKA_LOG_DIRS=/var/lib/kafka/data
-ENV KAFKA_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
-ENV KAFKA_INTER_BROKER_LISTENER_NAME=PLAINTEXT
-ENV KAFKA_CONTROLLER_LISTENER_NAMES=CONTROLLER
-ENV KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,SSL:SSL,SASL_PLAINTEXT:SASL_PLAINTEXT,SASL_SSL:SASL_SSL
 ENV KAFKA_LOG_RETENTION_HOURS=168
 ENV KAFKA_HEAP_OPTS="-Xms512m -Xmx512m"
-CMD cd $KAFKA_PATH/config/kraft ;\
-    sed -i "s|^node.id=.*|node.id=$KAFKA_NODE_ID|g" server.properties ;\
-    sed -i "s|^controller.quorum.voters=.*|controller.quorum.voters=$KAFKA_CONTROLLER_QUORUM_VOTERS|g" server.properties ;\
-    sed -i "s|^log.dirs=.*|log.dirs=$KAFKA_LOG_DIRS|g" server.properties ;\
-    sed -i "s|^listeners=.*|listeners=$KAFKA_LISTENERS|g" server.properties ;\
-    sed -i "s|^inter.broker.listener.name=.*|inter.broker.listener.name=$KAFKA_INTER_BROKER_LISTENER_NAME|g" server.properties ;\
-    sed -i "s|^controller.listener.names=.*|controller.listener.names=$KAFKA_CONTROLLER_LISTENER_NAMES|g" server.properties ;\
-    sed -i "s|^listener.security.protocol.map=.*|listener.security.protocol.map=$KAFKA_LISTENER_SECURITY_PROTOCOL_MAP|g" server.properties ;\
-    sed -i "s|^log.retention.hours=.*|log.retention.hours=$KAFKA_LOG_RETENTION_HOURS|g" server.properties ;\
-    cd $KAFKA_PATH ;\
-    RANDOM_UUID=$(./bin/kafka-storage.sh random-uuid) ;\
-    sh ./bin/kafka-storage.sh format -t $RANDOM_UUID -c ./config/kraft/server.properties ;\
-    sh ./bin/kafka-server-start.sh ./config/kraft/server.properties
-
+COPY ./entrypoint.sh /
+RUN ["chmod", "+x", "/entrypoint.sh"]
+ENTRYPOINT ["/entrypoint.sh"]
