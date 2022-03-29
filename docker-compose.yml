@@ -2,14 +2,22 @@ version: "3"
 services:
   kafka:
     build: .
-    image: jleijendekker/kafka:1.0.0
+    image: jleijendekker/kafka:1.1.0
     platform: linux/arm64
     hostname: kafka
     container_name: kafka
     ports:
       - "9092:9092"
       - "9093:9093"
-      - "29092:29092"
+      - "9094:9094"
+      - "30092:30092"
+    environment:
+      REPLICAS: "1"
+      SERVICE: kafka-service
+      NAMESPACE: kafka
+      KAFKA_LOG_DIRS: /var/lib/kafka/data
+      KAFKA_LOG_RETENTION_HOURS: "168"
+      KAFKA_HEAP_OPTS: -Xms512m -Xmx512m
     volumes:
       - kafka_data:/var/lib/kafka/data
     networks:
