@@ -23,11 +23,6 @@ fi
 envsubst < "/opt/kafka/config/kraft/server.properties" > "/opt/kafka/config/kraft/server.properties.updated"
 mv /opt/kafka/config/kraft/server.properties.updated /opt/kafka/config/kraft/server.properties
 
-envsubst < "/opt/kafka/config/kafka_broker_jaas.conf" > "/opt/kafka/config/kafka_broker_jaas.conf.updated"
-mv /opt/kafka/config/kafka_broker_jaas.conf.updated /opt/kafka/config/kafka_broker_jaas.conf
-
 kafka-storage.sh format -t $CLUSTER_ID -c /opt/kafka/config/kraft/server.properties
-
-export KAFKA_OPTS="-Djava.security.auth.login.config=/opt/kafka/config/kafka_broker_jaas.conf"
 
 exec kafka-server-start.sh /opt/kafka/config/kraft/server.properties
