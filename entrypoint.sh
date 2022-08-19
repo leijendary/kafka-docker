@@ -2,6 +2,7 @@
 
 export NODE_ID=${HOSTNAME:6}
 export CONTROLLER_QUORUM_VOTERS=""
+export ADVERTISED_IP=${ADVERTISED_IP:localhost}
 
 for i in $(seq 0 $REPLICAS); do
     if [[ $i != $REPLICAS ]]; then
